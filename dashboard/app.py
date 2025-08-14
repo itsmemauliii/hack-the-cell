@@ -20,20 +20,24 @@ if uploaded_file:
             "fluorescence": row["Fluorescence"],
             "growth": row["Growth"]
         }
+
         try:
-            F_min, F_max, K_d, n = 100, 1000, 0.5, 2.0
-conc = ((row["Fluorescence"] - F_min) * (K_d ** n) /
-        ((F_max - row["Fluorescence"]) ** (1/n)))
-conc = abs(conc)
-status = "Safe" if conc < 0.3 else "Unsafe"
-results.append({
-    "sample_id": row["SampleID"],
-    "estimated_metal_concentration": round(conc, 4),
-    "status": status
-})
+            # Try backend API first
+            r = requests.post("http://localhost:8000/analyze", json=payload, timeout=2)
+            r.raise_for_status()
             results.append(r.json())
-        except Exception as e:
-            st.error(f"API request failed: {e}")
+        except Exception:
+            # Fallback to local calculation
+            F_min, F_max, K_d, n = 100, 1000, 0.5, 2.0
+            conc = ((row["Fluorescence"] - F_min) * (K_d ** n) /
+                    ((F_max - row["Fluorescence"]) ** (1/n)))
+            conc = abs(conc)
+            status = "Safe" if conc < 0.3 else "Unsafe"
+            results.append({
+                "sample_id": row["SampleID"],
+                "estimated_metal_concentration": round(conc, 4),
+                "status": status
+            })
 
     if results:
         st.subheader("Analysis Results")

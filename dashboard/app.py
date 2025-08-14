@@ -2,26 +2,30 @@ import streamlit as st
 import pandas as pd
 import requests
 
-st.set_page_config(page_title="Hack the Cell Dashboard", layout="wide")
+st.set_page_config(page_title="Hack the Cell", layout="centered")
 
-st.title("Hack the Cell - Biosensor Results")
-st.write("Upload biosensor readings and get real-time analysis.")
+st.title("🧬 Hack the Cell: Heavy Metal Biosensor Dashboard")
+st.markdown("Upload biosensor readings to estimate contaminant levels.")
 
 uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
-    st.write("Uploaded Data", df)
+    st.dataframe(df)
 
     results = []
     for _, row in df.iterrows():
         payload = {
-            "sample_id": str(row["SampleID"]),
-            "fluorescence": float(row["Fluorescence"]),
-            "growth": float(row["Growth"])
+            "sample_id": row["SampleID"],
+            "fluorescence": row["Fluorescence"],
+            "growth": row["Growth"]
         }
-        r = requests.post("http://localhost:8000/analyze", json=payload)
-        results.append(r.json())
+        try:
+            r = requests.post("http://localhost:8000/analyze", json=payload)
+            results.append(r.json())
+        except Exception as e:
+            st.error(f"API request failed: {e}")
 
-    results_df = pd.DataFrame(results)
-    st.write("Analysis Results", results_df)
+    if results:
+        st.subheader("Analysis Results")
+        st.dataframe(pd.DataFrame(results))

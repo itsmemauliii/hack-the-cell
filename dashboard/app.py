@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import requests
 
 st.set_page_config(page_title="Hack the Cell", layout="centered")
 
@@ -11,33 +10,27 @@ uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
+    st.subheader("Uploaded Data")
     st.dataframe(df)
 
     results = []
     for _, row in df.iterrows():
-        payload = {
-            "sample_id": row["SampleID"],
-            "fluorescence": row["Fluorescence"],
-            "growth": row["Growth"]
-        }
+        # Parameters for Hill equation
+        F_min, F_max, K_d, n = 100, 1000, 0.5, 2.0
 
-        try:
-            # Try backend API first
-            r = requests.post("http://localhost:8000/analyze", json=payload, timeout=2)
-            r.raise_for_status()
-            results.append(r.json())
-        except Exception:
-            # Fallback to local calculation
-            F_min, F_max, K_d, n = 100, 1000, 0.5, 2.0
-            conc = ((row["Fluorescence"] - F_min) * (K_d ** n) /
-                    ((F_max - row["Fluorescence"]) ** (1/n)))
-            conc = abs(conc)
-            status = "Safe" if conc < 0.3 else "Unsafe"
-            results.append({
-                "sample_id": row["SampleID"],
-                "estimated_metal_concentration": round(conc, 4),
-                "status": status
-            })
+        # Estimate concentration (simple biosensor model)
+        conc = ((row["Fluorescence"] - F_min) * (K_d ** n) /
+                ((F_max - row["Fluorescence"]) ** (1/n)))
+        conc = abs(conc)
+
+        # Safety threshold
+        status = "Safe" if conc < 0.3 else "Unsafe"
+
+        results.append({
+            "sample_id": row["SampleID"],
+            "estimated_metal_concentration": round(conc, 4),
+            "status": status
+        })
 
     if results:
         st.subheader("Analysis Results")

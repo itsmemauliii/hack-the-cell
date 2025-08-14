@@ -10,11 +10,12 @@ def run_backend():
         "--port", "8000"
     ])
 
-# Start FastAPI in a background thread
-threading.Thread(target=run_backend, daemon=True).start()
+if __name__ == "__main__":
+    # Start FastAPI in background
+    threading.Thread(target=run_backend, daemon=True).start()
 
-# Wait for backend to start
-time.sleep(3)
+    # Give backend time to start
+    time.sleep(3)
 
-# Launch Streamlit
-os.system("streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0")
+    # Run Streamlit dashboard
+    os.system("streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0")

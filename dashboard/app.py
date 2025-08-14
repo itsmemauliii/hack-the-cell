@@ -18,12 +18,12 @@ if uploaded_file:
         # Parameters for Hill equation
         F_min, F_max, K_d, n = 100, 1000, 0.5, 2.0
 
-        # Estimate concentration (simple biosensor model)
+        # Estimate concentration
         conc = ((row["Fluorescence"] - F_min) * (K_d ** n) /
                 ((F_max - row["Fluorescence"]) ** (1/n)))
         conc = abs(conc)
 
-        # Safety threshold
+        # Safety check
         status = "Safe" if conc < 0.3 else "Unsafe"
 
         results.append({

@@ -1,17 +1,12 @@
-FROM python:3.10-slim AS backend
-WORKDIR /app/backend
-COPY backend/requirements.txt .
-RUN pip install -r requirements.txt
-COPY backend .
+FROM python:3.10
 
-FROM python:3.10-slim AS dashboard
-WORKDIR /app/dashboard
-COPY dashboard/requirements.txt .
-RUN pip install -r requirements.txt
-COPY dashboard .
+WORKDIR /app
 
-# To run backend
-# docker run -p 8000:8000 backend uvicorn main:app --host 0.0.0.0 --port 8000
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# To run dashboard
-# docker run -p 8501:8501 dashboard streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+COPY . .
+
+EXPOSE 8501
+
+CMD ["python", "run_app.py"]

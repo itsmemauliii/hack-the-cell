@@ -5,7 +5,7 @@
 ---
 
 ## Inspiration
-We face urgent crises—contaminated water, antibiotic resistance, and microplastics in ecosystems. What if we treated cells like programmable machines and used them to fix problems directly? **Hack the Cell** merges synthetic biology with modern software to create solutions that are innovative, ethical, and deployable.
+We face urgent crises, contaminated water, antibiotic resistance, and microplastics in ecosystems. What if we treated cells like programmable machines and used them to fix problems directly? **Hack the Cell** merges synthetic biology with modern software to create solutions that are innovative, ethical, and deployable.
 
 ---
 
